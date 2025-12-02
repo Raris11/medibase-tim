@@ -29,29 +29,6 @@ def role_required(allowed_roles):
         return decorated_function
     return decorator
 
-@app.route('/registrasi', methods=['GET', 'POST'])
-@role_required(['petugas']) # Hanya Petugas (CRUD)
-def registrasi():
-    cur = mysql.connection.cursor()
-
-    if request.method == 'POST':
-        nama = request.form['nama']
-        tgl = request.form['tanggal_lahir']
-        jk = request.form['jenis_kelamin']
-        alamat = request.form['alamat']
-        nohp = request.form['no_hp']
-
-        cur.execute("""
-            INSERT INTO pasien (nama, tanggal_lahir, jenis_kelamin, alamat, no_hp, tanggal_registrasi)
-            VALUES (%s, %s, %s, %s, %s, NOW())
-        """, (nama, tgl, jk, alamat, nohp))
-
-        mysql.connection.commit()
-        cur.close()
-        return redirect('/pasien')
-
-    return render_template('registrasi.html', title="Registrasi Pasien")
-
 @app.route('/')
 def landing():
     if 'logged_in' in session:
@@ -304,12 +281,310 @@ def pasien():
     data = cur.fetchall()
     cur.close()
     return render_template('pasien.html', pasien=data, title="Data Pasien")
+-----
+
+@app.route('/pasien/tambah', methods=['GET', 'POST'])
+@role_required(['petugas'])
+def tambah_pasien():
+    if request.method == 'POST':
+        nama = request.form['nama']
+        tgl = request.form['tanggal_lahir']
+        alamat = request.form['alamat']
+
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            INSERT INTO pasien (nama, tanggal_lahir, alamat)
+            VALUES (%s, %s, %s)
+        """, (nama, tgl, alamat))
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect('/pasien')
+
+    return render_template('tambah_pasien.html', title="Tambah Pasien")
+
+@app.route('/pasien/edit/<id>', methods=['GET','POST'])
+@role_required(['petugas'])
+def edit_pasien(id):
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        nama = request.form['nama']
+        tgl = request.form['tanggal_lahir']
+        alamat = request.form['alamat']
+
+        cur.execute("""
+            UPDATE pasien SET nama=%s, tanggal_lahir=%s, alamat=%s
+            WHERE id_pasien=%s
+        """, (nama, tgl, alamat, id))
+
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect('/pasien')
+
+    cur.execute("SELECT * FROM pasien WHERE id_pasien=%s", (id,))
+    data = cur.fetchone()
+    cur.close()
+
+    return render_template('edit_pasien.html', pasien=data, title="Edit Pasien")
+
+@app.route('/pasien/hapus/<id>')
+@role_required(['petugas'])
+def hapus_pasien(id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM pasien WHERE id_pasien=%s", (id,))
+    mysql.connection.commit()
+    cur.close()
+    return redirect('/pasien')
+
+@app.route('/kunjungan')
+@role_required(['admin', 'petugas'])
+def kunjungan():
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT 
+            k.id_kunjungan,
+            k.tanggal_kunjungan,
+            k.keluhan,
+            k.diagnosis,
+            p.nama AS nama_pasien,
+            d.nama AS nama_dokter,
+            GROUP_CONCAT(CONCAT(o.nama_obat, ' (', r.jumlah, ')') 
+                SEPARATOR '<br>') AS daftar_obat
+        FROM kunjungan k
+        JOIN pasien p ON k.id_pasien = p.id_pasien
+        JOIN dokter d ON k.id_dokter = d.id_dokter
+        LEFT JOIN resep r ON k.id_kunjungan = r.id_kunjungan
+        LEFT JOIN obat o ON r.id_obat = o.id_obat
+        GROUP BY k.id_kunjungan
+        ORDER BY k.id_kunjungan ASC
+    """)
+
+    data = cur.fetchall()
+    cur.close()
+
+    return render_template('kunjungan.html', kunjungan=data, title="Data Kunjungan")
+
+@app.route('/kunjungan/tambah', methods=['GET','POST'])
+@role_required(['petugas'])
+def tambah_kunjungan():
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        id_pasien = request.form['id_pasien']
+        id_dokter = request.form['id_dokter']
+        tanggal = request.form['tanggal_kunjungan']
+        keluhan = request.form['keluhan']
+        diagnosa = request.form['diagnosa']
+
+        cur.execute("""
+            INSERT INTO kunjungan (id_pasien, id_dokter, tanggal_kunjungan, keluhan, diagnosis)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (id_pasien, id_dokter, tanggal, keluhan, diagnosa))
+
+        id_kunjungan = cur.lastrowid 
+
+        id_obat_list = request.form.getlist('id_obat[]')
+        jumlah_list = request.form.getlist('jumlah[]')
+        dosis_list = request.form.getlist('dosis[]')
+
+        for i in range(len(id_obat_list)):
+            id_obat = id_obat_list[i]
+            jumlah = jumlah_list[i]
+            dosis = dosis_list[i]
+
+            cur.execute("""
+                INSERT INTO resep (id_kunjungan, id_obat, jumlah, dosis)
+                VALUES (%s, %s, %s, %s)
+            """, (id_kunjungan, id_obat, jumlah, dosis))
+
+        mysql.connection.commit()
+        cur.close()
+
+        return redirect('/kunjungan')
+
+    cur.execute("SELECT * FROM pasien")
+    pasien = cur.fetchall()
+
+    cur.execute("SELECT * FROM dokter")
+    dokter = cur.fetchall()
+
+    cur.execute("SELECT * FROM obat")
+    obat = cur.fetchall()
+
+    cur.close()
+
+    return render_template('tambah_kunjungan.html', pasien=pasien, dokter=dokter, obat=obat, title="Tambah Kunjungan")
+
+@app.route('/kunjungan/edit/<id>', methods=['GET', 'POST'])
+@role_required(['petugas'])
+def edit_kunjungan(id):
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        
+        id_pasien = request.form['id_pasien']
+        id_dokter = request.form['id_dokter']
+        tanggal = request.form['tanggal_kunjungan']
+        keluhan = request.form['keluhan']
+        diagnosis = request.form['diagnosis']
+
+        cur.execute("""
+            UPDATE kunjungan
+            SET id_pasien=%s, id_dokter=%s, tanggal_kunjungan=%s,
+                keluhan=%s, diagnosis=%s
+            WHERE id_kunjungan=%s
+        """, (id_pasien, id_dokter, tanggal, keluhan, diagnosis, id))
+
+        mysql.connection.commit()
+        cur.close()
+        return redirect('/kunjungan')
+
+    cur.execute("""
+        SELECT k.*, p.nama AS nama_pasien, d.nama AS nama_dokter
+        FROM kunjungan k
+        JOIN pasien p ON k.id_pasien = p.id_pasien
+        JOIN dokter d ON k.id_dokter = d.id_dokter
+        WHERE k.id_kunjungan=%s
+    """, (id,))
+    kunj = cur.fetchone()
+
+    cur.execute("SELECT * FROM pasien")
+    pasien = cur.fetchall()
+
+    cur.execute("SELECT * FROM dokter")
+    dokter = cur.fetchall()
+
+    cur.close()
+
+    return render_template(
+        'edit_kunjungan.html',
+        kunjungan=kunj,
+        pasien=pasien,
+        dokter=dokter
+    )
+
+@app.route('/kunjungan/hapus/<id>')
+@role_required(['petugas'])
+def hapus_kunjungan(id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM kunjungan WHERE id_kunjungan=%s", (id,))
+    mysql.connection.commit()
+    cur.close()
+    return redirect('/kunjungan')
 
 
+@app.route('/riwayat', methods=['GET'])
+@role_required(['admin', 'petugas'])
+def riwayat():
+    cur = mysql.connection.cursor()
 
+    keyword = request.args.get("cari", "")
 
+    if keyword:
+        cur.execute("""
+            SELECT id_pasien, nama, tanggal_lahir, jenis_kelamin, no_hp
+            FROM pasien
+            WHERE nama LIKE %s
+            ORDER BY nama ASC
+        """, ("%" + keyword + "%",))
+    else:
+        cur.execute("""
+            SELECT DISTINCT p.id_pasien, p.nama, p.tanggal_lahir, p.jenis_kelamin, p.no_hp
+            FROM pasien p
+            JOIN kunjungan k ON p.id_pasien = k.id_pasien
+            ORDER BY p.nama ASC
+        """)
 
+    pasien_list = cur.fetchall()
+    cur.close()
 
+    return render_template("riwayat.html", pasien_list=pasien_list, title="Riwayat Pasien")
+
+@app.route('/riwayat/<id_pasien>')
+@role_required(['admin', 'petugas'])
+def detail_riwayat(id_pasien):
+    cur = mysql.connection.cursor()
+
+    cur.execute("""
+        SELECT *, HitungUmur(tanggal_lahir) AS umur
+        FROM pasien 
+        WHERE id_pasien = %s
+    """, (id_pasien,))
+    pasien = cur.fetchone()
+
+    cur.execute("""
+        SELECT 
+            k.id_kunjungan,
+            k.tanggal_kunjungan,
+            k.keluhan,
+            k.diagnosis,
+            d.nama AS nama_dokter,
+            o.nama_obat,
+            r.jumlah,
+            r.dosis,
+            (o.harga * r.jumlah) AS subtotal
+        FROM kunjungan k
+        JOIN dokter d ON k.id_dokter = d.id_dokter
+        LEFT JOIN resep r ON k.id_kunjungan = r.id_kunjungan
+        LEFT JOIN obat o ON r.id_obat = o.id_obat
+        WHERE k.id_pasien = %s
+        ORDER BY k.id_kunjungan ASC 
+    """, (id_pasien,))
+    riwayat = cur.fetchall()
+
+    total_biaya = {}
+    sudah = set()
+
+    for r in riwayat:
+        id_k = r["id_kunjungan"]
+        if id_k not in sudah:
+            cur2 = mysql.connection.cursor() 
+            try:
+                cur2.callproc("HitungTotalBiaya", (id_k,))
+                hasil = cur2.fetchall()
+                total_biaya[id_k] = hasil[0]["Total_Biaya"]
+            except Exception as e:
+                print(f"Error calling HitungTotalBiaya for {id_k}: {e}")
+                total_biaya[id_k] = 0 
+            finally:
+                cur2.close()
+
+            sudah.add(id_k)
+
+    cur.close()
+
+    return render_template(
+        "detail_riwayat.html",
+        pasien=pasien,
+        riwayat=riwayat,
+        total_biaya=total_biaya
+    )
+
+@app.route('/registrasi', methods=['GET', 'POST'])
+@role_required(['petugas'])
+def registrasi():
+    cur = mysql.connection.cursor()
+
+    if request.method == 'POST':
+        nama = request.form['nama']
+        tgl = request.form['tanggal_lahir']
+        jk = request.form['jenis_kelamin']
+        alamat = request.form['alamat']
+        nohp = request.form['no_hp']
+
+        cur.execute("""
+            INSERT INTO pasien (nama, tanggal_lahir, jenis_kelamin, alamat, no_hp, tanggal_registrasi)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+        """, (nama, tgl, jk, alamat, nohp))
+
+        mysql.connection.commit()
+        cur.close()
+        return redirect('/pasien')
+
+    return render_template('registrasi.html', title="Registrasi Pasien")
 
 if __name__ == '__main__':
     app.run(debug=True)
