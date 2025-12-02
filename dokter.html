@@ -1,1 +1,48 @@
+{% extends "base_dashboard.html" %}
 
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Data Dokter</div>
+    <div class="card-subtitle">Kelola semua data dokter dan spesialis</div>
+</div>
+
+{% if session.get('role') == 'admin' %}
+<a href="/dokter/tambah" class="btn">➕ Tambah Dokter</a>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Spesialis</th>
+            <th>No HP</th>
+            <th>Jadwal Praktek</th>
+            <th>Aksi</th>
+        </tr>
+       </thead>
+        <tbody>
+            {% for d in dokter %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ d.nama }}</td>
+                <td>{{ d.spesialis }}</td>
+                <td>{{ d.no_hp }}</td>
+                <td>{{ d.jadwal_praktek }}</td>
+                <td>
+                    {% if session.get('role') == 'admin' %}
+                        <a href="/dokter/edit/{{ d.id_dokter }}" class="action-link">✏️ Edit</a>
+                        <a href="/dokter/hapus/{{ d.id_dokter }}" class="action-link delete" onclick="return confirm('Hapus dokter?')">🗑️ Hapus</a>
+                    {% else %}
+                        Tidak Ada Aksi
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
