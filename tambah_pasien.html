@@ -1,1 +1,20 @@
+{% extends "base1.html" %}
+
+{% block content %}
+<h2>Tambah Pasien</h2>
+
+<form method="POST">
+    Nama:<br>
+    <input type="text" name="nama" required><br><br>
+
+    Tanggal Lahir:<br>
+    <input type="date" name="tanggal_lahir" required><br><br>
+
+    Alamat:<br>
+    <textarea name="alamat" required></textarea><br><br>
+
+    <button type="submit">Simpan</button>
+</form>
+
+{% endblock %}
 
