@@ -1,1 +1,135 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Tambah Kunjungan Baru</div>
+        <div class="card-subtitle">Lengkapi formulir untuk mencatat kunjungan pasien</div>
+    </div>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Pasien</label>
+            <select name="id_pasien" required>
+                <option value="">Pilih pasien</option>
+                {% for p in pasien %}
+                <option value="{{ p.id_pasien }}">{{ p.nama }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Dokter</label>
+            <select name="id_dokter" required>
+                <option value="">Pilih dokter</option>
+                {% for d in dokter %}
+                <option value="{{ d.id_dokter }}">{{ d.nama }} - {{ d.spesialis }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tanggal Kunjungan</label>
+            <input type="date" name="tanggal_kunjungan" required>
+        </div>
+
+        <div class="form-group">
+            <label>Keluhan</label>
+            <textarea name="keluhan" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Diagnosa</label>
+            <textarea name="diagnosa" rows="3" required></textarea>
+        </div>
+
+        <hr style="margin:25px 0;">
+
+        <h3 style="margin-bottom:10px;">💊 Resep Obat</h3>
+
+        <table style="width:100%; margin-bottom:15px;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;">Obat</th>
+                    <th style="text-align:left;">Jumlah</th>
+                    <th style="text-align:left;">Dosis</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody id="obat-container">
+                <tr>
+                    <td>
+                        <select name="id_obat[]" required>
+                            <option value="">Pilih obat</option>
+                            {% for o in obat %}
+                            <option value="{{ o.id_obat }}">{{ o.nama_obat }} (Stok: {{ o.stok }})</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+
+                    <td>
+                        <input type="number" name="jumlah[]" min="1" required>
+                    </td>
+
+                    <td>
+                        <input type="text" name="dosis[]" required placeholder="Contoh: 3x1">
+                    </td>
+
+                    <td>
+                        <button type="button" class="btn-secondary" onclick="hapusBaris(this)">❌</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button type="button" class="btn" onclick="tambahObat()">➕ Tambah Obat</button>
+
+        <div class="form-actions" style="margin-top:20px;">
+            <button type="submit" class="btn">💾 Simpan</button>
+            <a href="/kunjungan" class="btn-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function tambahObat() {
+    let container = document.getElementById("obat-container");
+
+    let row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>
+            <select name="id_obat[]" required>
+                <option value="">Pilih obat</option>
+                {% for o in obat %}
+                <option value="{{ o.id_obat }}">{{ o.nama_obat }} (Stok: {{ o.stok }})</option>
+                {% endfor %}
+            </select>
+        </td>
+
+        <td>
+            <input type="number" name="jumlah[]" min="1" required>
+        </td>
+
+        <td>
+            <input type="text" name="dosis[]" required placeholder="Contoh: 3x1">
+        </td>
+
+        <td>
+            <button type="button" class="btn-secondary" onclick="hapusBaris(this)">❌</button>
+        </td>
+    `;
+
+    container.appendChild(row);
+}
+
+function hapusBaris(btn) {
+    btn.closest("tr").remove();
+}
+</script>
+
+{% endblock %}
 
