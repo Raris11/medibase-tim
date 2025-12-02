@@ -1,1 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+
+        .navbar {
+            background: #007bff;
+            padding: 15px;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            margin: 20px auto;
+            max-width: 1200px; /* diperlebar */
+            width: 95%; /* biar fleksibel */
+            overflow-x: auto; /* biar tabel besar tidak keluar */
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/registrasi">Registrasi Pasien</a>
+        <a href="/pasien">Data Pasien</a>
+        <a href="/dokter">Data Dokter</a>
+        <a href="/obat">Data Obat</a>
+        <a href="/kunjungan">Data Kunjungan</a>   <!-- Tambahan penting -->
+        <a href="/riwayat">Riwayat Pasien</a>
+        
+
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>
 
