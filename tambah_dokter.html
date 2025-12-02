@@ -1,1 +1,39 @@
+{% extends "base_dashboard.html" %}
 
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Tambah Dokter Baru</div>
+        <div class="card-subtitle">Lengkapi formulir untuk menambahkan dokter baru</div>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label>Nama Dokter</label>
+            <input type="text" name="nama" required placeholder="Dr. Nama Lengkap">
+        </div>
+
+        <div class="form-group">
+            <label>Spesialis</label>
+            <input type="text" name="spesialis" required placeholder="Contoh: Umum, Anak, Jantung">
+        </div>
+
+        <div class="form-group">
+            <label>No HP</label>
+            <input type="text" name="no_hp" required placeholder="08xxxxxxxxxx">
+        </div>
+
+        <div class="form-group">
+            <label>Jadwal Praktek</label>
+            <input type="text" name="jadwal_praktek" required placeholder="Senin-Jumat 08:00-16:00">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">💾 Simpan</button>
+            <a href="/dokter" class="btn-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
