@@ -1,1 +1,60 @@
+{% extends "base_dashboard.html" %}
 
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Edit Data Kunjungan</div>
+        <div class="card-subtitle">Perbarui informasi kunjungan pasien</div>
+    </div>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Pasien</label>
+            <select name="id_pasien" required>
+                {% for p in pasien %}
+                    <option value="{{ p.id_pasien }}"
+                        {% if p.id_pasien == kunjungan.id_pasien %} selected {% endif %}>
+                        {{ p.nama }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Dokter</label>
+            <select name="id_dokter" required>
+                {% for d in dokter %}
+                    <option value="{{ d.id_dokter }}"
+                        {% if d.id_dokter == kunjungan.id_dokter %} selected {% endif %}>
+                        {{ d.nama }} - {{ d.spesialis }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tanggal Kunjungan</label>
+            <input type="date" name="tanggal_kunjungan" value="{{ kunjungan.tanggal_kunjungan }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Keluhan</label>
+            <textarea name="keluhan" rows="3" required>{{ kunjungan.keluhan }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Diagnosis</label>
+            <textarea name="diagnosis" rows="3" required>{{ kunjungan.diagnosis }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">💾 Update</button>
+            <a href="/kunjungan" class="btn-secondary">Batal</a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
