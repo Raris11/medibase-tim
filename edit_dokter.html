@@ -1,1 +1,41 @@
+{% extends "base_dashboard.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Edit Data Dokter</div>
+        <div class="card-subtitle">Perbarui informasi dokter</div>
+    </div>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Nama Dokter</label>
+            <input type="text" name="nama_dokter" value="{{ dokter.nama }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Spesialis</label>
+            <input type="text" name="spesialis" value="{{ dokter.spesialis }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>No HP</label>
+            <input type="text" name="no_hp" value="{{ dokter.no_hp }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Jadwal Praktek</label>
+            <input type="text" name="jadwal_praktek" value="{{ dokter.jadwal_praktek }}" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">💾 Update</button>
+            <a href="/dokter" class="btn-secondary">Batal</a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
 
