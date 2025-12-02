@@ -1,0 +1,39 @@
+MediBase adalah aplikasi web sistem informasi sederhana yang dirancang untuk mengelola alur kerja operasional dasar sebuah klinik atau fasilitas kesehatan kecil. Aplikasi ini menyediakan fitur CRUD (Create, Read, Update, Delete) untuk data pasien, dokter, obat, dan mengelola riwayat kunjungan serta resep, dengan fokus kuat pada penerapan konsep manajemen basis data tingkat lanjut.
+============================================================================================================================
+Disusun Oleh :
+Arkan Afarel	2417052013	
+Salsabila Eka Putri	2417052015	
+Raris Angustianto	2417052019	
+Ketrin Pertiwi	2457052006
+===========================================================================================================================
+Fitur Utama Aplikasi
+  Sistem ini membagi fungsionalitas berdasarkan peran (Admin dan Petugas):
+  1.  Autentikasi Berbasis Peran (Security): Menerapkan Role-Based Access Control (@role_required) untuk membatasi akses modul.
+  2.  Dashboard Summary: Menyajikan overview statistik penting dari data master dan kunjungan hari ini.
+  3.  Modul Data Master (Admin Focus): Kontrol penuh (CRUD) data Dokter dan Obat/Inventaris.
+      Modul Operasional (Petugas Focus):
+      Registrasi & CRUD Pasien: Manajemen data dasar pasien.
+      1.Pencatatan Kunjungan & Resep: Mengelola riwayat medis, keluhan, diagnosis, dan input resep obat, memicu Trigger     otomatis.
+      2.Riwayat Pasien & Billing: Menampilkan detail kunjungan, daftar resep, dan total biaya per kunjungan yang dihitung menggunakan Function/Stored Procedure.
+============================================================================================================================
+Implementasi Basis Data Tingkat Lanjut
+  Proyek MediBase secara khusus menerapkan konsep-konsep basis data kompleks berikut :
+  1.Trigger (trg_kurangi_stok): Otomasi pengurangan stok obat di tabel obat setiap kali resep baru dimasukkan ke tabel resep.
+  2.User Defined Functions (UDFs):
+    - HitungUmur(): Menghitung usia pasien secara dinamis dari tanggal lahir.
+    - TotalBiayaKunjungan(): Menghitung total biaya resep secara clean untuk laporan.
+    - Stored Procedure (HitungTotalBiaya): Digunakan untuk perhitungan biaya yang dipanggil dari backend Python.
+  3.Kueri Kompleks & Agregasi: Menggunakan JOIN multi-tabel (kunjungan, resep, obat, pasien, dokter), COUNT, dan SUM untuk menghasilkan dashboard dan laporan riwayat.Fitur Utama Aplikasi
+  4.Sistem ini membagi fungsionalitas berdasarkan peran (Admin dan Petugas):
+    - Autentikasi Berbasis Peran (Security): Menerapkan Role-Based Access Control (@role_required) untuk membatasi akses modul.
+    - Dashboard Summary: Menyajikan overview statistik penting dari data master dan kunjungan hari ini.
+    - Modul Data Master (Admin Focus): Kontrol penuh (CRUD) data Dokter dan Obat/Inventaris.
+    Modul Operasional (Petugas Focus):
+      - Registrasi & CRUD Pasien: Manajemen data dasar pasien.
+      - Pencatatan Kunjungan & Resep: Mengelola riwayat medis, keluhan, diagnosis, dan input resep obat, memicu Trigger otomatis.
+      - Riwayat Pasien & Billing: Menampilkan detail kunjungan, daftar resep, dan total biaya per kunjungan yang dihitung menggunakan Function/Stored Procedure.
+============================================================================================================================
+Tumpukan Teknologi & Petunjuk Menjalankan Aplikasi
+  1.Backend: Python (Flask)
+  2.Database: MySQL
+  3.Konektivitas: flask_mysqldb
