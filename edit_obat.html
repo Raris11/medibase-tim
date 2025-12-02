@@ -1,1 +1,58 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Edit Data Obat</div>
+        <div class="card-subtitle">Perbarui informasi obat</div>
+    </div>
+
+    <form method="POST">
+        
+        <!-- Nama Obat -->
+        <div class="form-group">
+            <label>Nama Obat</label>
+            <input type="text" name="nama_obat" value="{{ obat.nama_obat }}" required>
+        </div>
+
+        <!-- Kategori -->
+        <div class="form-group">
+            <label>Kategori Obat</label>
+            <select name="kategori" required>
+                <option value="Tablet"  {{ 'selected' if obat.kategori == 'Tablet' else '' }}>Tablet</option>
+                <option value="Sirup"   {{ 'selected' if obat.kategori == 'Sirup' else '' }}>Sirup</option>
+                <option value="Injeksi" {{ 'selected' if obat.kategori == 'Injeksi' else '' }}>Injeksi</option>
+                <option value="Kapsul"  {{ 'selected' if obat.kategori == 'Kapsul' else '' }}>Kapsul</option>
+                <option value="Salep"   {{ 'selected' if obat.kategori == 'Salep' else '' }}>Salep</option>
+            </select>
+        </div>
+
+        <!-- Stok -->
+        <div class="form-group">
+            <label>Stok</label>
+            <input type="number" name="stok" value="{{ obat.stok }}" required>
+        </div>
+
+        <!-- Harga -->
+        <div class="form-group">
+            <label>Harga (Rp)</label>
+            <input type="number" name="harga" value="{{ obat.harga }}" required>
+        </div>
+
+        <!-- Tanggal Exp -->
+        <div class="form-group">
+            <label>Tanggal Expired</label>
+            <input type="date" name="tanggal_exp" value="{{ obat.tanggal_exp }}" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn">💾 Update</button>
+            <a href="/obat" class="btn-secondary">Batal</a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
 
