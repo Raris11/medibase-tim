@@ -1,1 +1,49 @@
+{% extends "base_dashboard.html" %}
 
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Data Pasien</div>
+        <div class="card-subtitle">Kelola semua data pasien rumah sakit</div>
+    </div>
+
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Tanggal Lahir</th>
+                <th>Alamat</th>
+                <th>Jenis Kelamin</th>
+                <th>No HP</th>
+                <th>Tanggal Registrasi</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pasien %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.nama }}</td>
+                <td>{{ p.tanggal_lahir }}</td>
+                <td>{{ p.alamat }}</td>
+                <td>{{ p.jenis_kelamin }}</td>
+                <td>{{ p.no_hp }}</td>
+                <td>{{ p.tanggal_registrasi }}</td>
+                <td>
+                    {% if session.get('role') == 'petugas' %}
+                        <a href="/pasien/edit/{{ p.id_pasien }}">Edit</a> |
+                        <a href="/pasien/hapus/{{ p.id_pasien }}" onclick="return confirm('Hapus pasien?')">Hapus</a>
+                    {% else %}
+                        Tidak Ada Aksi
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
