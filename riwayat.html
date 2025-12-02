@@ -1,1 +1,53 @@
+{% extends "base_dashboard.html" %}
 
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Riwayat Medis Pasien</div>
+        <div class="card-subtitle">Lihat riwayat kunjungan dan perawatan pasien</div>
+    </div>
+
+    <div class="form-group">
+        <label>Cari Pasien</label>
+        <form method="GET" style="display: flex; gap: 10px;">
+            <input type="text" name="cari" placeholder="Nama pasien..." value="{{ request.args.get('cari', '') }}" style="flex: 1;">
+            <button type="submit" class="btn">🔍 Cari</button>
+        </form>
+    </div>
+
+    {% if pasien_list %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID Pasien</th>
+                <th>Nama</th>
+                <th>Tanggal Lahir</th>
+                <th>Jenis Kelamin</th>
+                <th>No HP</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pasien_list %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.nama }}</td>
+                <td>{{ p.tanggal_lahir }}</td>
+                <td>{{ 'Laki-laki' if p.jenis_kelamin == 'L' else 'Perempuan' }}</td>
+                <td>{{ p.no_hp }}</td>
+                <td>
+                    <a href="/riwayat/{{ p.id_pasien }}" class="action-link">📋 Lihat Riwayat</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>🔍 Gunakan pencarian untuk menemukan pasien</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
