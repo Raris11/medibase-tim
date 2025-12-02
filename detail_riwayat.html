@@ -1,1 +1,145 @@
+{% extends "base_dashboard.html" %}
 
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">Riwayat Medis - {{ pasien.nama }}</div>
+        <div class="card-subtitle">
+            Detail informasi pasien dan seluruh riwayat kunjungan & resep obat
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">ID Pasien:</span>
+            <span class="info-value">{{ pasien.id_pasien }}</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Umur:</span>
+            <span class="info-value">{{ pasien.umur }} tahun</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Tanggal Lahir:</span>
+            <span class="info-value">{{ pasien.tanggal_lahir }}</span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">Jenis Kelamin:</span>
+            <span class="info-value">
+                {{ 'Laki-laki' if pasien.jenis_kelamin == 'L' else 'Perempuan' }}
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="info-label">No HP:</span>
+            <span class="info-value">{{ pasien.no_hp }}</span>
+        </div>
+
+        <div class="info-item" style="grid-column: 1 / -1;">
+            <span class="info-label">Alamat:</span>
+            <span class="info-value">{{ pasien.alamat }}</span>
+        </div>
+    </div>
+
+    <h3 style="margin-top: 30px; margin-bottom: 15px; color: #1e293b;">
+        📋 Riwayat Kunjungan & Resep
+    </h3>
+
+    {% if riwayat %}
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Dokter</th>
+                <th>Keluhan</th>
+                <th>Diagnosa</th>
+                <th>Obat</th>
+                <th>Jumlah</th>
+                <th>Dosis</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for k in riwayat %}
+            <tr>
+                <td>{{ k.tanggal_kunjungan }}</td>
+                <td>{{ k.nama_dokter }}</td>
+                <td>{{ k.keluhan }}</td>
+                <td>{{ k.diagnosis }}</td>
+
+                <td>{{ k.nama_obat or '-' }}</td>
+                <td>{{ k.jumlah or '-' }}</td>
+                <td>{{ k.dosis or '-' }}</td>
+                <td>
+                    {% if k.subtotal %}
+                        Rp {{ k.subtotal }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 style="margin-top: 20px;">💰 Total Biaya Per Kunjungan</h3>
+
+    {% for id_k, total in total_biaya.items() %}
+        <p><strong>ID Kunjungan {{ id_k }}:</strong> Rp {{ total }}</p>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty-state">
+        <p>📋 Belum ada riwayat kunjungan</p>
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+        <a href="/riwayat" class="btn-secondary">← Kembali</a>
+    </div>
+</div>
+
+<style>
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+</style>
+
+{% endblock %}
